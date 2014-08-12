@@ -1,0 +1,5 @@
+- name: common playbook
+  hosts: all
+  sudo: true
+  roles:
+    - common

@@ -1,0 +1,64 @@
+# Misc
+- name: add aeromock user
+  user: name=aeromock state=present
+- name: add aeromock personal directory
+  file: path=/home/aeromock/.aeromock state=directory owner=aeromock group=aeromock
+- name: create log directory
+  file: path=/var/log/aeromock state=directory owner=aeromock group=aeromock
+- name: add psdash user
+  user: name=psdash state=present
+- name: copy PS1.sh
+  copy: src=../files/etc/profile.d/PS1.sh dest=/etc/profile.d/PS1.sh owner=root group=root mode=644
+- name: install the 'Development tools' package group
+  yum: name="@Development tools" state=present
+- name: copy iptables
+  copy: src=../files/etc/sysconfig/iptables dest=/etc/sysconfig/iptables owner=root group=root mode=644
+- name: reload iptables
+  service: name=iptables state=reloaded
+- name: check shared folder of vagrant
+  copy: src=../files/usr/local/bin/check-shared-folder.sh dest=/usr/local/bin/check-shared-folder.sh owner=root group=root mode=755
+
+# Java
+- name: install java
+  yum: name=java-1.7.0-openjdk state=present
+
+# Nginx
+- name: install nginx rpm
+  yum: name=http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm state=present
+- name: install nginx
+  yum: name=nginx state=present
+- name: delete default.conf
+  file: path=/etc/nginx/conf.d/default.conf state=absent
+- name: copy virtual.conf
+  copy: src=../files/etc/nginx/conf.d/virtual.conf dest=/etc/nginx/conf.d/virtual.conf owner=root group=root mode=644
+- name: prepare basic password
+  shell: printf "{{basic_user}}:$(openssl passwd -crypt {{basic_pass}})\n" > /etc/nginx/htpasswd
+- name: make sure nginx is running
+  service: name=nginx state=started
+- name: reload nginx
+  shell: /etc/init.d/nginx reload
+
+# psdash
+- name: install python-devel
+  yum: name=python-devel state=present
+- name: install pip
+  shell: curl -kL https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+- name: install psdash
+  shell: pip install psdash
+- name: copy psdash script
+  copy: src=../files/etc/init.d/psdash dest=/etc/init.d/psdash owner=root group=root mode=755
+- name: enable psdash
+  service: name=psdash enabled=yes
+- name: make sure psdash is running
+  service: name=psdash state=restarted
+
+# Aeromock
+- name: copy /etc/init.d/aeromock
+  copy: src=../files/etc/init.d/aeromock dest=/etc/init.d/aeromock owner=root group=root mode=755
+- name: enable Aeromock
+  service: name=aeromock enabled=yes
+- name: start Aeromock
+  service: name=aeromock state=started
+- name: link config yaml
+  file: src=/vagrant/config.yaml dest=/home/aeromock/.aeromock/config.yaml owner=aeromock group=aeromock state=link
+

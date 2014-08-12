@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+#
+# Startup script for aeromock.
+
+# To get the service to restart correctly on reboot, uncomment below (3 lines):
+# ========================
+# chkconfig: 3 99 99
+# description: aeromock
+# processname: aeromock
+# ========================
+
+# Source function library.
+. /etc/init.d/functions
+
+usage()
+{
+    echo "Usage: ${0##*/} [-d] {start|stop|restart} [ CONFIGS ... ] "
+    exit 1
+}
+
+[ $# -gt 0 ] || usage
+
+##################################################
+# Some utility functions
+##################################################
+findDirectory()
+{
+  local L OP=$1
+  shift
+  for L in "$@"; do
+    [ "$OP" "$L" ] || continue
+    printf %s "$L"
+    break
+  done
+}
+
+running()
+{
+  local PID=$(cat "$1" 2>/dev/null) || return 1
+  kill -0 "$PID" 2>/dev/null
+}
+
+AEROMOCK_HOME=/aeromock
+AEROMOCK_USER=aeromock
+LIB_DIR=$AEROMOCK_HOME/lib
+LIB_TEMPLATE_DIR=$LIB_DIR/templates
+
+CLASS_PATH="$LIB_DIR/core/*"
+for TEMPLATE in `ls $LIB_TEMPLATE_DIR`
+do
+  CLASS_PATH="$CLASS_PATH:$LIB_TEMPLATE_DIR/$TEMPLATE/*"
+done
+
+PROG=aeromock
+AEROMOCK_CMD="java $JAVA_OPTIONS -cp \"$CLASS_PATH\" ameba.aeromock.Aeromock"
+PIDFILE=/var/run/$PROG.pid
+
+start() {
+  echo -n $"Starting $PROG: "
+
+  if [ -f $PIDFILE ]; then
+    PID=`cat $PIDFILE`
+    PID_CHECK=`ps ax | cut -d" " -f2 | grep $PID`
+    if [ ! -z $PID_CHECK ]; then
+      failure $"Already Running"
+      return 1
+    fi
+  fi
+
+  daemon --user aeromock $AEROMOCK_HOME/aeromock > /var/log/aeromock/aeromock.log 2>&1 &
+  RETVAL=$?
+  sleep 3
+
+  PID=`ps ax | grep java | grep aeromock | cut -d" " -f2`
+
+  echo
+  [ $RETVAL -ne 0 ] && failure
+  [ $RETVAL -eq 0 ] && echo $PID > $PIDFILE && success
+}
+
+stop() {
+  echo -n $"Stopping $PROG: "
+
+  PID=`ps ax | grep java | grep aeromock | cut -d" " -f2`
+  if [ -z $PID ]; then
+    failure $"no process"
+    exit 1
+  fi
+
+  echo
+  [ ! -z $PID ] && kill $PID && rm -rf $PIDFILE && success
+}
+
+
+ACTION=$@
+case "$ACTION" in
+  start)
+    start
+    ;;
+
+  stop)
+    stop
+    ;;
+
+  restart)
+    stop "$@"
+    start "$@"
+    ;;
+  *)
+    usage
+esac
+
+exit $?

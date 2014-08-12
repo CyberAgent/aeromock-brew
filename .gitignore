@@ -1,0 +1,14 @@
+*.class
+
+# Gradle
+.gradle/
+build/
+
+# IDEA
+.idea/
+*.iml
+
+# eclipse
+.classpath
+.project
+.settings/

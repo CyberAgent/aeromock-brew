@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+REPO_DIR=`dirname ${0}`
+LIB_DIR=$REPO_DIR/lib
+LIB_TEMPLATE_DIR=$LIB_DIR/templates
+
+CLASS_PATH="$LIB_DIR/core/*"
+for TEMPLATE in `ls $LIB_TEMPLATE_DIR`
+do
+  CLASS_PATH="$CLASS_PATH:$LIB_TEMPLATE_DIR/$TEMPLATE/*"
+done
+
+java \
+  -classpath "$CLASS_PATH" \
+  -Xmx512m \
+  -Xms64m \
+  -XX:MaxPermSize=256m \
+  -XX:PermSize=64m \
+  ameba.aeromock.cli.AeromockCli $@
