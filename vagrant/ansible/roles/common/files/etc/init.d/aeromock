@@ -52,7 +52,7 @@ do
 done
 
 PROG=aeromock
-AEROMOCK_CMD="java $JAVA_OPTIONS -cp \"$CLASS_PATH\" ameba.aeromock.Aeromock"
+AEROMOCK_CMD="java $JAVA_OPTIONS -cp \"$CLASS_PATH\" jp.co.cyberagent.aeromock.Aeromock"
 PIDFILE=/var/run/$PROG.pid
 
 start() {

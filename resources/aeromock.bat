@@ -5,4 +5,4 @@ cmd /k java -classpath ".\lib\aeromock-server\*;.\lib\aeromock-cli\*;.\lib\templ
   -Xms64m ^
   -XX:MaxPermSize=128m ^
   -XX:PermSize=64m ^
-  ameba.aeromock.Aeromock %*
+  jp.co.cyberagent.aeromock.Aeromock %*

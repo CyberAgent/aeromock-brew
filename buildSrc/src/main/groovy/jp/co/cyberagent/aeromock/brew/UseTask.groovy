@@ -10,6 +10,8 @@ import java.nio.file.Files
  */
 class UseTask extends BaseTask {
 
+    private static final PACKAGE = "jp.co.cyberagent.aeromock"
+
     def coreModules = [
         "aeromock-server",
         "aeromock-cli",
@@ -34,7 +36,7 @@ class UseTask extends BaseTask {
         // configuration settings
         project.configurations.create("core")
         coreModules.each { name ->
-            project.dependencies.add("core", project.dependencies.create("ameba.aeromock:${name}_2.11:$resolveVersion"))
+            project.dependencies.add("core", project.dependencies.create("${PACKAGE}:${name}_2.11:$resolveVersion"))
         }
 
         // download modules.txt
@@ -54,7 +56,7 @@ class UseTask extends BaseTask {
 
         templateModules.each { name ->
             project.configurations.create(name)
-            project.dependencies.add(name, project.dependencies.create("ameba.aeromock:${name}_2.11:$resolveVersion"))
+            project.dependencies.add(name, project.dependencies.create("${PACKAGE}:${name}_2.11:$resolveVersion"))
         }
 
         // copy core modules

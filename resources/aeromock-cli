@@ -15,4 +15,4 @@ java \
   -Xms64m \
   -XX:MaxPermSize=256m \
   -XX:PermSize=64m \
-  ameba.aeromock.cli.AeromockCli $@
+  jp.co.cyberagent.aeromock.cli.AeromockCli $@
