@@ -11,15 +11,15 @@ class VersionsTask extends BaseTask {
     @TaskAction
     def process() {
 
-        def destFile = aeromockDir.resolve(".versions").toFile()
+        def versionsFile = aeromockDir.resolve(".versions").toFile()
         project.download {
             src "${githubRootRaw}/versions.txt"
-            dest destPath
+            dest versionsFile
             quiet true
             onlyIfNewer true
         }
 
-        if (!destFile.exists()) {
+        if (!versionsFile.exists()) {
             throw new AeromockBrewJobFailedException("Failed to download versions info.")
         }
 
